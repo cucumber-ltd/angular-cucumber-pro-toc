@@ -1,0 +1,19 @@
+{
+  "name": "cucumber-pro-toc",
+  "version": "0.0.0",
+  "description": "Cucumber Pro Table of Contents Angular Module",
+  "main": "server.js",
+  "scripts": {
+    "test": "./node_modules/.bin/karma start --single-run --browsers Chrome"
+  },
+  "author": "Matt Wynne <matt@mattwynne.net>",
+  "license": "MIT",
+  "devDependencies": {
+    "angular": "^1.2.19",
+    "karma": "^0.12.17",
+    "karma-chrome-launcher": "^0.1.4",
+    "karma-cli": "0.0.4",
+    "karma-jasmine": "^0.1.5",
+    "requirejs": "^2.1.14"
+  }
+}

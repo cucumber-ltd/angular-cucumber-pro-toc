@@ -1,0 +1,17 @@
+{
+  "name": "cucumber-pro-toc",
+  "version": "0.0.0",
+  "authors": [
+    "Matt Wynne <matt@mattwynne.net>"
+  ],
+  "description": "Table of Contents Directive for Cucumber Pro Angular app",
+  "main": "toc.js",
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "bower_components",
+    "node_modules",
+    "spec"
+  ]
+}
