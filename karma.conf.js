@@ -5,7 +5,7 @@ module.exports = function(config) {
   config.set({
 
     // base path that will be used to resolve all patterns (eg. files, exclude)
-    basePath: '',
+    basePath: 'src',
 
 
     // frameworks to use
@@ -15,9 +15,11 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      'node_modules/angular/lib/angular.js',
-      'src/*.js',
-      'spec/*.js'
+      '../node_modules/angular/lib/angular.js',
+      '../node_modules/angular-mocks/angular-mocks.js',
+      '*.js',
+      '*.html',
+      '../spec/*.js'
     ],
 
 
@@ -26,16 +28,16 @@ module.exports = function(config) {
     ],
 
 
-    // preprocess matching files before serving them to the browser
-    // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
+    // generate js files from html templates
     preprocessors: {
+      '*.html': 'ng-html2js'
     },
 
 
     // test results reporter to use
     // possible values: 'dots', 'progress'
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-    reporters: ['progress'],
+    reporters: ['progress', 'osx'],
 
 
     // web server port
@@ -57,7 +59,7 @@ module.exports = function(config) {
 
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: ['Chrome'],
+    browsers: ['PhantomJS'],
 
 
     // Continuous Integration mode
