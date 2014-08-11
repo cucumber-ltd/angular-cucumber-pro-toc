@@ -17,8 +17,9 @@ module.exports = function(config) {
     files: [
       '../node_modules/angular/lib/angular.js',
       '../node_modules/angular-mocks/angular-mocks.js',
+      '../node_modules/jquery/dist/jquery.min.js',
+      '../node_modules/jasmine-jquery/lib/jasmine-jquery.js',
       '*.js',
-      '*.html',
       '../spec/*.js'
     ],
 
@@ -26,12 +27,6 @@ module.exports = function(config) {
     // list of files to exclude
     exclude: [
     ],
-
-
-    // generate js files from html templates
-    preprocessors: {
-      '*.html': 'ng-html2js'
-    },
 
 
     // test results reporter to use
