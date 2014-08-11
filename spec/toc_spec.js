@@ -4,7 +4,7 @@ describe('toc', function () {
   beforeEach(module('CucumberProTOC'));
 
   beforeEach(inject(function($rootScope, $compile) {
-    element = $('<cp-toc docs="docs">');
+    element = $('<div><cp-toc docs="docs"></cp-toc></div>');
     scope = $rootScope.$new();
     compile = $compile;
   }));
@@ -31,7 +31,7 @@ describe('toc', function () {
   });
 
   it('renders with an open class if the doc is open', function (callback) {
-    element = $('<cp-toc docs="docs" current-doc-path="\'open.feature\'">');
+    element = $('<div><cp-toc docs="docs" current-doc-path="\'open.feature\'"></cp-toc></div>');
     renderDocs([
       { path: 'not_open.feature', name: 'Not open' },
       { path: 'open.feature', name: 'Open' },
@@ -43,8 +43,10 @@ describe('toc', function () {
   });
 
   it('fires the onclick function when clicked', function (callback) {
-    scope.onClickFn = jasmine.createSpy('on-click callback');
-    element = $('<cp-toc docs="docs" on-click="onClickFn(doc)">');
+    scope.$apply(function () {
+      scope.onClickFn = jasmine.createSpy('on-click callback');
+    });
+    element = $('<div><cp-toc docs="docs" on-click="onClickFn(doc)"></cp-toc></div>');
     var docs = [
       { path: 'clicked.feature', name: 'Clicked' },
       { path: 'not_clicked.feature', name: 'Not clicked' },
@@ -52,10 +54,8 @@ describe('toc', function () {
     var expectedDoc = docs[1];
     renderDocs(docs);
 
-    var a = $(element.find('li a')[0]);
-    console.log(a);
-    a.click();
-    scope.$digest();
+    var link = element.find('li').eq(0).find('a');
+    link.click();
     expect(scope.onClickFn).toHaveBeenCalledWith(expectedDoc);
   });
 
@@ -64,9 +64,4 @@ describe('toc', function () {
     compile(element)(scope);
     scope.$digest();
   }
-
-  // open
-  //
-  // fires onlick
-  //
 });

@@ -1,6 +1,7 @@
 angular.module('CucumberProTOC', [])
   .directive('cpToc', function() {
     return {
+      replace: true,
       template: '<nav class="feature-browser"> \
                    <ul data-ng-show="docs.length > 0"> \
                      <li data-ng-repeat="doc in docs | orderBy:\'path\'" ng-class="{ dirty: doc.isDirty(), open: isDocOpen(doc) }"> \
