@@ -4,7 +4,7 @@ angular.module('CucumberProTOC', [])
     return {
       replace: true,
       template: '<nav class="feature-browser"> \
-                   <cp-toc-level docs="levelDocs" onClick="onClick", current-doc-path="currentDocPath"> \
+                   <cp-toc-level docs="levelDocs" current-doc-path="currentDocPath"> \
                  </nav>',
       restrict: 'E',
       scope: {
@@ -12,6 +12,12 @@ angular.module('CucumberProTOC', [])
         onClick: "&",
         currentDocPath: "="
       },
+
+      controller: function ($scope) {
+        // share the onClick function with all the child cp-level directives
+        this.onClick = $scope.onClick;
+      },
+
       link: function (scope, element, attributes) {
         // TODO: nest docs and pass nested list to cp-toc-level
         scope.levelDocs = scope.docs;
@@ -21,6 +27,8 @@ angular.module('CucumberProTOC', [])
 
   .directive('cpTocLevel', function () {
     return {
+      replace: true,
+      require: '^cpToc',
       template: '<ul data-ng-show="docs.length > 0"> \
                    <li data-ng-repeat="doc in docs | orderBy:\'path\'" ng-class="{ dirty: doc.isDirty(), open: isDocOpen(doc) }"> \
                      <a data-ng-click="onClick({ doc: doc }); $event.stopPropagation()" title="{{ doc.path }}">{{ doc.name }}</a> \
@@ -29,10 +37,10 @@ angular.module('CucumberProTOC', [])
       restrict: 'E',
       scope: {
         docs: "=",
-        onClick: "&",
         currentDocPath: "="
       },
-      link: function (scope, element, attributes) {
+      link: function (scope, element, attributes, controller) {
+        scope.onClick = controller.onClick;
         scope.isDocOpen = function (doc) {
           return (doc.path === scope.currentDocPath);
         };
