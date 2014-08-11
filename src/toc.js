@@ -1,5 +1,4 @@
-var toc = angular.module('toc', []);
-angular.module('toc')
+angular.module('CucumberProTOC', [])
   .directive('toc', function() {
     return {
       templateUrl: 'toc.html',

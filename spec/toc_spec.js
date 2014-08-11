@@ -1,7 +1,7 @@
 describe('toc', function () {
   var element, scope;
 
-  beforeEach(module('toc'));
+  beforeEach(module('CucumberProTOC'));
   beforeEach(module('toc.html'));
 
   beforeEach(inject(function($rootScope, $compile) {
