@@ -42,7 +42,7 @@ describe('toc', function () {
     expect($(listItems[1]).hasClass('open')).toBeTruthy();
   });
 
-  it('fires the onclick function when clicked', function (callback) {
+  xit('fires the onclick function when clicked', function (callback) {
     scope.$apply(function () {
       scope.onClickFn = jasmine.createSpy('on-click callback');
     });
