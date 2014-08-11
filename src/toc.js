@@ -3,7 +3,7 @@ angular.module('CucumberProTOC', [])
   .directive('cpToc', function () {
     return {
       replace: true,
-      template: '<nav class="feature-browser"> \
+      template: '<nav class="docs"> \
                    <cp-toc-level docs="levelDocs" current-doc-path="currentDocPath"> \
                  </nav>',
       restrict: 'E',
