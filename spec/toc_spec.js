@@ -19,6 +19,20 @@ describe('toc', function () {
     expect(listItems.length).toBe(2);
   });
 
+  it('updates when the docs attribute changes', function (callback) {
+    renderDocs([
+      { path: 'foo.feature', name: 'Foo' },
+    ]);
+
+    var listItems = element.find('li');
+    expect(listItems.length).toBe(1);
+
+    scope.docs.push({ path: 'bar.feature', name: 'Bar' });
+    scope.$digest();
+    var listItems = element.find('li');
+    expect(listItems.length).toBe(2);
+  });
+
   it('renders with a `dirty` class if the doc is dirty', function (callback) {
     renderDocs([
       { path: 'clean.feature', name: 'Clean', isDirty: function () { return false; } },

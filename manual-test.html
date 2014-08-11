@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  <head lang="en">
+  </head>
+  <body>
+    <div ng-app="testApp">
+      <div ng-controller="Controller">
+        <textarea ng-model="json" rows="10"></textarea>
+        <button ng-click="render()">Render</button>
+        <div>docs.length = {{docs.length}}</div>
+        <cp-toc docs="docs"></cp-toc>
+      </div>
+    </div>
+    <script src="./node_modules/angular/lib/angular.min.js"></script>
+    <script src="./src/toc.js"></script>
+    <script>
+      var app = angular.module("testApp", ['CucumberProTOC']);
+      app.controller("Controller", function ($scope) {
+        $scope.docs = [
+          { path: 'foo.feature', name: 'Foo' }
+        ];
+        $scope.json = JSON.stringify($scope.docs, null, 2);
+        $scope.render = function () {
+          console.log($scope.json);
+          $scope.docs = JSON.parse($scope.json);
+          console.log($scope.docs);
+        }
+      });
+    </script>
+  </body>
+</html>

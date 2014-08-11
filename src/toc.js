@@ -19,8 +19,14 @@ angular.module('CucumberProTOC', [])
       },
 
       link: function (scope, element, attributes) {
-        // TODO: nest docs and pass nested list to cp-toc-level
-        scope.levelDocs = scope.docs;
+        scope.$watch('docs', function (docs) {
+          scope.levelDocs = nest(docs);
+        });
+
+        function nest(flatDocs) {
+          // TODO
+          return flatDocs;
+        }
       }
     };
   })
