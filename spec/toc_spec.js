@@ -19,7 +19,7 @@ describe('toc', function () {
     expect(listItems.length).toBe(2);
   });
 
-  it('renders with a dirty class if the doc is dirty', function (callback) {
+  it('renders with a `dirty` class if the doc is dirty', function (callback) {
     renderDocs([
       { path: 'clean.feature', name: 'Clean', isDirty: function () { return false; } },
       { path: 'dirty.feature', name: 'Dirty', isDirty: function () { return true; } },
@@ -30,7 +30,7 @@ describe('toc', function () {
     expect($(listItems[1]).hasClass('dirty')).toBeTruthy();
   });
 
-  it('renders with an open class if the doc is open', function (callback) {
+  it('renders with an `open` class if the doc is open', function (callback) {
     element = $('<div><cp-toc docs="docs" current-doc-path="\'open.feature\'"></cp-toc></div>');
     renderDocs([
       { path: 'not_open.feature', name: 'Not open' },
@@ -40,6 +40,18 @@ describe('toc', function () {
     var listItems = element.find('li');
     expect($(listItems[0]).hasClass('open')).toBeFalsy();
     expect($(listItems[1]).hasClass('open')).toBeTruthy();
+  });
+
+  it('renders with an `outdated` class if the doc is outdated', function (callback) {
+    element = $('<div><cp-toc docs="docs"></cp-toc></div>');
+    renderDocs([
+      { path: 'outdated.feature', name: 'Outdated', isOutdated: function () { return true; } },
+      { path: 'pristine.feature', name: 'Pristine', isOutdated: function () { return false; } }
+    ]);
+
+    var listItems = element.find('li');
+    expect($(listItems[0]).hasClass('outdated')).toBeTruthy();
+    expect($(listItems[1]).hasClass('outdated')).toBeFalsy();
   });
 
   xit('fires the onclick function when clicked', function (callback) {
