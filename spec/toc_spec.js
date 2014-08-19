@@ -9,19 +9,19 @@ describe('toc', function () {
     compile = $compile;
   }));
 
-  it('renders one <li> per doc', function (callback) {
+  it('renders one <li> per doc', function () {
     renderDocs([
       { path: 'foo.feature', name: 'Foo' },
-      { path: 'foo/bar/baz.feature', name: 'Baz' },
+      { path: 'foo/bar/baz.feature', name: 'Baz' }
     ]);
 
     var listItems = element.find('li');
     expect(listItems.length).toBe(2);
   });
 
-  it('updates when the docs attribute changes', function (callback) {
+  it('updates when the docs attribute changes', function () {
     renderDocs([
-      { path: 'foo.feature', name: 'Foo' },
+      { path: 'foo.feature', name: 'Foo' }
     ]);
 
     var listItems = element.find('li');
@@ -29,14 +29,14 @@ describe('toc', function () {
 
     scope.docs.push({ path: 'bar.feature', name: 'Bar' });
     scope.$digest();
-    var listItems = element.find('li');
+    listItems = element.find('li');
     expect(listItems.length).toBe(2);
   });
 
-  it('renders with a `dirty` class if the doc is dirty', function (callback) {
+  it('renders with a `dirty` class if the doc is dirty', function () {
     renderDocs([
       { path: 'clean.feature', name: 'Clean', isDirty: function () { return false; } },
-      { path: 'dirty.feature', name: 'Dirty', isDirty: function () { return true; } },
+      { path: 'dirty.feature', name: 'Dirty', isDirty: function () { return true; } }
     ]);
 
     var listItems = element.find('li');
@@ -44,11 +44,11 @@ describe('toc', function () {
     expect($(listItems[1]).hasClass('dirty')).toBeTruthy();
   });
 
-  it('renders with an `open` class if the doc is open', function (callback) {
+  it('renders with an `open` class if the doc is open', function () {
     element = $('<div><cp-toc docs="docs" current-doc-path="\'open.feature\'"></cp-toc></div>');
     renderDocs([
       { path: 'not_open.feature', name: 'Not open' },
-      { path: 'open.feature', name: 'Open' },
+      { path: 'open.feature', name: 'Open' }
     ]);
 
     var listItems = element.find('li');
@@ -56,7 +56,7 @@ describe('toc', function () {
     expect($(listItems[1]).hasClass('open')).toBeTruthy();
   });
 
-  it('renders with an `outdated` class if the doc is outdated', function (callback) {
+  it('renders with an `outdated` class if the doc is outdated', function () {
     element = $('<div><cp-toc docs="docs"></cp-toc></div>');
     renderDocs([
       { path: 'outdated.feature', name: 'Outdated', isOutdated: function () { return true; } },
@@ -68,6 +68,18 @@ describe('toc', function () {
     expect($(listItems[1]).hasClass('outdated')).toBeFalsy();
   });
 
+  it('renders with a `deleted` class if the doc is deleted', function () {
+    element = $('<div><cp-toc docs="docs"></cp-toc></div>');
+    renderDocs([
+      { path: 'deleted.feature', name: 'Deleted', isDeleted: function () { return true; } },
+      { path: 'pristine.feature', name: 'Pristine', isDeleted: function () { return false; } }
+    ]);
+
+    var listItems = element.find('li');
+    expect($(listItems[0]).hasClass('deleted')).toBeTruthy();
+    expect($(listItems[1]).hasClass('deleted')).toBeFalsy();
+  });
+
   xit('fires the onclick function when clicked', function (callback) {
     scope.$apply(function () {
       scope.onClickFn = jasmine.createSpy('on-click callback');
@@ -75,7 +87,7 @@ describe('toc', function () {
     element = $('<div><cp-toc docs="docs" on-click="onClickFn(doc)"></cp-toc></div>');
     var docs = [
       { path: 'clicked.feature', name: 'Clicked' },
-      { path: 'not_clicked.feature', name: 'Not clicked' },
+      { path: 'not_clicked.feature', name: 'Not clicked' }
     ];
     var expectedDoc = docs[1];
     renderDocs(docs);

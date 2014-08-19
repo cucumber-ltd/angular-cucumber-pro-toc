@@ -36,7 +36,9 @@ angular.module('CucumberProTOC', [])
       replace: true,
       require: '^cpToc',
       template: '<ol data-ng-show="docs.length > 0">\
-                   <li data-ng-repeat="doc in docs | orderBy:\'path\'" ng-class="{ dirty: doc.isDirty(), open: isDocOpen(doc), outdated: doc.isOutdated() }"><a data-ng-click="onClick({ doc: doc }); $event.stopPropagation()" title="{{ doc.path }}">{{ doc.name }}</a></li>\
+                   <li data-ng-repeat="doc in docs | orderBy:\'path\'" ng-class="{dirty: doc.isDirty(), outdated: doc.isOutdated(), deleted: doc.isDeleted(), open: isDocOpen(doc) }">\
+                     <a data-ng-click="onClick({ doc: doc }); $event.stopPropagation()" title="{{ doc.path }}">{{ doc.name }}</a>\
+                   </li>\
                  </ol>',
       restrict: 'E',
       scope: {
