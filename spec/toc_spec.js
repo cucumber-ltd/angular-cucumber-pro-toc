@@ -9,14 +9,34 @@ describe('toc', function () {
     compile = $compile;
   }));
 
+  it('renders a single doc', function () {
+    renderDocs([
+      { path: 'foo.feature', name: 'Foo' },
+    ]);
+
+    var listItems = element.find('li');
+    expect(listItems.length).toBe(1);
+  });
+
   it('renders one <li> per doc', function () {
     renderDocs([
       { path: 'foo.feature', name: 'Foo' },
-      { path: 'foo/bar/baz.feature', name: 'Baz' }
+      { path: 'bar.feature', name: 'Bar' }
     ]);
 
     var listItems = element.find('li');
     expect(listItems.length).toBe(2);
+  });
+
+  it('renders nested lists', function ()  {
+    renderDocs([
+      { path: 'one.feature', name: 'One' },
+      { path: 'two/three.feature', name: 'Three' }
+    ]);
+
+    var links = element.find('nav ol li a').toArray();
+    names = links.map(function (a) { return a.text; });
+    expect(names).toEqual(["One", "Two"]);
   });
 
   it('updates when the docs attribute changes', function () {

@@ -19,6 +19,7 @@ module.exports = function(config) {
       '../node_modules/angular-mocks/angular-mocks.js',
       '../node_modules/jquery/dist/jquery.min.js',
       '../node_modules/jasmine-jquery/lib/jasmine-jquery.js',
+      '../bower_components/inflection/inflection.min.js',
       '*.js',
       '../spec/*.js'
     ],

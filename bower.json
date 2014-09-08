@@ -15,5 +15,8 @@
     "spec",
     "karma.conf.js",
     "package.json"
-  ]
+  ],
+  "dependencies": {
+    "inflection": "~1.4.2"
+  }
 }
