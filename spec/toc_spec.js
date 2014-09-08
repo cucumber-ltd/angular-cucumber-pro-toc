@@ -1,18 +1,43 @@
 describe('toc', function () {
-  var element, scope, compile;
+  var element, scope, compile, q;
 
   beforeEach(module('CucumberProTOC'));
+  beforeEach(module('CucumberProTOC'));
 
-  beforeEach(inject(function($rootScope, $compile) {
+  beforeEach(inject(function($rootScope, $compile, $q) {
     element = $('<div><cp-toc docs="docs"></cp-toc></div>');
     scope = $rootScope.$new();
     compile = $compile;
+    q = $q;
   }));
 
   it('renders a single doc', function () {
     renderDocs([
       { path: 'foo.feature', name: 'Foo' },
     ]);
+
+    var listItems = element.find('li');
+    expect(listItems.length).toBe(1);
+  });
+
+  it('handles undefined docs', function () {
+    renderDocs();
+    var listItems = element.find('li');
+    expect(listItems.length).toBe(0);
+  });
+
+  iit('handles promises (e.g. an angular resource)', function () {
+    var docs = [
+      { path: 'foo.feature', name: 'Foo' },
+    ];
+    var deferred = q.defer();
+    var promise = deferred.promise;
+    var result = { $promise: promise }
+    promise.then(function () { 
+      result[0] = docs[0];
+    });
+    deferred.resolve();
+    renderDocs(result);
 
     var listItems = element.find('li');
     expect(listItems.length).toBe(1);

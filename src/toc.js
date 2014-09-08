@@ -20,7 +20,14 @@ angular.module('CucumberProTOC', [])
 
       link: function (scope, element, attributes) {
         scope.$watch('docs', function (docs) {
-          scope.levelDocs = nest(docs);
+          if (!docs) return;
+          if (docs.$promise) {
+            docs.$promise.then(function () {
+              scope.levelDocs = nest(docs);
+            });
+          } else {
+            scope.levelDocs = nest(docs);
+          };
         });
 
         function nest(flatDocs) {
