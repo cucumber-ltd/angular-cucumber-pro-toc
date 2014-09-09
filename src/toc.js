@@ -31,8 +31,11 @@ angular.module('CucumberProTOC', [])
         });
 
         function nest(flatDocs) {
-          // TODO
-          return flatDocs;
+          // why does this break things so spectacularly?
+          levelDocs = flatDocs.map(function (doc) {
+            return doc;
+          });
+          return levelDocs;
         }
       }
     };
