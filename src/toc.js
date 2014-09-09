@@ -22,12 +22,12 @@ angular.module('CucumberProTOC', [])
         scope.$watch('docs', function (docs) {
           if (!docs) return;
           if (docs.$promise) {
-            docs.$promise.then(function () {
-              scope.levelDocs = nest(docs);
-            });
-          } else {
+            return docs.$promise.then(setLevelDocs);
+          }
+          setLevelDocs();
+          function setLevelDocs() {
             scope.levelDocs = nest(docs);
-          };
+          }
         });
 
         function nest(flatDocs) {
