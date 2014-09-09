@@ -26,7 +26,7 @@ describe('toc', function () {
     expect(listItems.length).toBe(0);
   });
 
-  iit('handles promises (e.g. an angular resource)', function () {
+  it('handles promises (e.g. an angular resource)', function () {
     var docs = [
       { path: 'foo.feature', name: 'Foo' },
     ];
