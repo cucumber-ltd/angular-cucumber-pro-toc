@@ -45,25 +45,14 @@ angular.module('CucumberProTOC', [])
     function TreeBuilder(docs) {
       var self = {
         tree: function () {
-          var levelDocs = docs.map(function (doc) {
-            if (doc.path.indexOf("/") < 0) return doc;
-            var segment = doc.path.split("/")[0]
-            var dir = {
-              path: segment,
-              name: inflection.capitalize(segment)
-            }
-            return dir;
-          }).reduce(function (docs, doc) {
-            var paths = docs.map(function (doc) { return doc.path; });
-            if (paths.indexOf(doc.path) < 0) {
-              doc.docs = doc.docs || [];
-              docs.push(doc);
-            } else {
-              docs[paths.indexOf(doc.path)].docs.push(doc);
-            }
-            return docs;
-          }, []);
-          return levelDocs;
+          function atThisLevel(doc) { return doc.path.indexOf("/") < 0; }
+          var docsAtThisLevel = _.filter(docs, atThisLevel);
+
+          docs.map(function (doc) {
+            doc.children = [];
+            return doc;
+          });
+          return docs;
         }
       }
       return self;

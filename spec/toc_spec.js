@@ -45,7 +45,7 @@ describe('toc', function () {
     expect(element.find('li').length).toBe(2);
   });
 
-  it('renders nested lists', function ()  {
+  xit('renders nested lists', function ()  {
     renderDocs([
       { path: 'one.feature', name: 'One' },
       { path: 'two/three.feature', name: 'Three' },
