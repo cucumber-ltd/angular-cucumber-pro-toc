@@ -5,19 +5,29 @@
   <body>
     <div ng-app="testApp">
       <div ng-controller="Controller">
-        <textarea ng-model="json" rows="10"></textarea>
-        <button ng-click="render()">Render</button>
-        <div>docs.length = {{docs.length}}</div>
-        <cp-toc docs="docs"></cp-toc>
+        <div style="float:left">
+          <h2>Input</h2>
+          <textarea ng-model="json" rows="20"></textarea>
+          <br>
+          <button ng-click="render()">Render</button>
+        </div>
+        <div style="float:left">
+          <h2>Output</h2>
+          <cp-toc docs="docs"></cp-toc>
+        </div>
       </div>
     </div>
-    <script src="./node_modules/angular/lib/angular.min.js"></script>
+    <script src="./bower_components/angular/angular.min.js"></script>
+    <script src="./bower_components/inflection/inflection.min.js"></script>
     <script src="./src/toc.js"></script>
     <script>
       var app = angular.module("testApp", ['CucumberProTOC']);
       app.controller("Controller", function ($scope) {
         $scope.docs = [
-          { path: 'foo.feature', name: 'Foo' }
+          { path: 'a.feature', name: 'A' },
+          { path: 'b/c.feature', name: 'C' },
+          { path: 'b/d.feature', name: 'D' },
+          { path: 'e.feature', name: 'E' }
         ];
         $scope.json = JSON.stringify($scope.docs, null, 2);
         $scope.render = function () {
