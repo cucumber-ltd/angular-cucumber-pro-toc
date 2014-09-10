@@ -1,1 +1,2 @@
-extract a cp-toc-level so we can recurse
+automatically find the root(s) for deep hierarchies
+make li class be configurable by the app

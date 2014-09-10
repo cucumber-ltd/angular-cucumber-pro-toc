@@ -42,17 +42,59 @@ angular.module('CucumberProTOC', [])
   }])
 
   .factory('TreeBuilder', [function() {
-    function TreeBuilder(docs) {
+    function TreeBuilder(nodes, root) {
+      root = root || '';
+      validateRoot();
+
+      function validateRoot() {
+        if (!root.match(/(^$|\/$)/)) {
+          throw new Error("Invalid root \"" + root + "\" - it must end with a forward-slash, or be an empty string.");
+        }
+
+        if (!_.find(_.map(nodes, 'path'), function (path) { return path.indexOf(root) === 0; })) {
+          throw new Error("Invalid root \"" + root + "\" for path \"" + path + "\".");
+        }
+      }
+
+      function relativePath(path) {
+        if (path.indexOf(root) !== 0) {
+        }
+        return path.replace(root, '');
+      }
+
+      function isAtThisLevel(node) { 
+        return relativePath(node.path).indexOf("/") < 0; 
+      }
+
+      function docs() {
+        return _.filter(nodes, isAtThisLevel);
+      }
+
+      function descendents() {
+        return _.reject(nodes, isAtThisLevel);
+      }
+
+      function descendentsOf(path) {
+        return _.filter(descendents(), function (node) {
+          return node.path.indexOf(path) === 0;
+        });
+      }
+
       var self = {
         tree: function () {
-          function atThisLevel(doc) { return doc.path.indexOf("/") < 0; }
-          var docsAtThisLevel = _.filter(docs, atThisLevel);
-
-          docs.map(function (doc) {
-            doc.children = [];
-            return doc;
+          function getPathSegment(doc) { 
+            return relativePath(doc.path).split("/")[0];
+          }
+          var segments = _.uniq(_.map(descendents(), getPathSegment));
+          var dirs = segments.map(function (segment) {
+            var path = root + segment;
+            return {
+              path: path,
+              name: inflection.humanize(segment),
+              children: new TreeBuilder(descendentsOf(path), path + '/').tree()
+            };
           });
-          return docs;
+          return docs().concat(dirs);
         }
       }
       return self;
@@ -64,8 +106,7 @@ angular.module('CucumberProTOC', [])
     return {
       replace: true,
       template: '<nav class="docs"> \
-                   <pre>{{ levelDocs }}</pre> \
-                   <cp-toc-level docs="levelDocs" current-doc-path="currentDocPath"> \
+                   <cp-toc-level nodes="nodes" current-doc-path="currentDocPath"> \
                  </nav>',
       restrict: 'E',
       scope: {
@@ -91,30 +132,8 @@ angular.module('CucumberProTOC', [])
           if (docs.$promise) return docs.$promise.then(set);
           set(docs);
           function set(docs) {
-            scope.levelDocs = new TreeBuilder(docs).tree();
+            scope.nodes = new TreeBuilder(docs).tree();
           }
-        }
-
-        function nest(flatDocs) {
-          levelDocs = flatDocs.map(function (doc) {
-            if (doc.path.indexOf("/") < 0) return doc;
-            var segment = doc.path.split("/")[0]
-            var dir = {
-              path: segment,
-              name: inflection.capitalize(segment)
-            }
-            return dir;
-          }).reduce(function (docs, doc) {
-            var paths = docs.map(function (doc) { return doc.path; });
-            if (paths.indexOf(doc.path) < 0) {
-              doc.docs = doc.docs || [];
-              docs.push(doc);
-            } else {
-              docs[paths.indexOf(doc.path)].docs.push(doc);
-            }
-            return docs;
-          }, []);
-          return levelDocs;
         }
       }
     };
@@ -125,22 +144,20 @@ angular.module('CucumberProTOC', [])
       replace: true,
       require: '^cpToc',
       template: '\
-      <div> \
-      <pre>{{ 2 }}</pre> \
-      <ol data-ng-show="docs.length > 0"> \
+      <ol data-ng-show="nodes.length > 0"> \
+         <pre>{{ nodes }}</pre> \
         <li \
-          data-ng-repeat="doc in docs | orderBy:\'path\'" \
-          ng-class="{dirty: doc.isDirty(), outdated: doc.isOutdated(), deleted: doc.isDeleted(), open: isDocOpen(doc) }">\
-          <a data-ng-click="onClick({ doc: doc }); $event.stopPropagation()" title="{{ doc.path }}">{{ doc.name }}</a>\
-          <cp-toc-level docs="doc.docs" current-doc-path="currentDocPath"> \
+          data-ng-repeat="node in nodes | orderBy:\'path\'" \
+          ng-class="{dirty: node.isDirty(), outdated: node.isOutdated(), deleted: node.isDeleted(), open: isDocOpen(node) }">\
+          <a data-ng-click="onClick({ doc: node }); $event.stopPropagation()" title="{{ node.path }}">{{ node.name }}</a>\
+          <cp-toc-level nodes="node.children" current-doc-path="currentDocPath"> \
         </li>\
       </ol> \
-      </div> \
       ',
       restrict: 'E',
 
       scope: {
-        docs: "=",
+        nodes: "=",
         currentDocPath: "="
       },
 
