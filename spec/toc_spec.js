@@ -55,6 +55,10 @@ describe('toc', function () {
     var links = element.find('nav ol li a').toArray();
     names = links.map(function (a) { return a.text; });
     expect(names).toEqual(["One", "Two"]);
+
+    var links = element.find('nav ol li ol li a').toArray();
+    names = links.map(function (a) { return a.text; });
+    expect(names).toEqual(["Three", "Four"]);
   });
 
   it('updates when the docs attribute is mutated', function () {

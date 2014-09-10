@@ -20,6 +20,7 @@ module.exports = function(config) {
       '../node_modules/jquery/dist/jquery.min.js',
       '../node_modules/jasmine-jquery/lib/jasmine-jquery.js',
       '../bower_components/inflection/inflection.min.js',
+      '../bower_components/lodash/dist/lodash.min.js',
       '*.js',
       '../spec/*.js'
     ],
