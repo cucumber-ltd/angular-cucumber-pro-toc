@@ -1,46 +1,39 @@
 describe('toc', function () {
-  var element, scope, compile, q;
+  var element, scope, compile, $q
 
   beforeEach(module('CucumberProTOC'));
   beforeEach(module('CucumberProTOC'));
 
-  beforeEach(inject(function($rootScope, $compile, $q) {
+  beforeEach(inject(function($rootScope, $compile, _$q_) {
     element = $('<div><cp-toc docs="docs"></cp-toc></div>');
     scope = $rootScope.$new();
     compile = $compile;
-    q = $q;
+    $q = _$q_;
   }));
 
   it('renders a single doc', function () {
     renderDocs([
       { path: 'foo.feature', name: 'Foo' },
     ]);
-
-    var listItems = element.find('li');
-    expect(listItems.length).toBe(1);
+    expect(element.find('li').length).toBe(1);
   });
 
   it('handles undefined docs', function () {
     renderDocs();
-    var listItems = element.find('li');
-    expect(listItems.length).toBe(0);
+    expect(element.find('li').length).toBe(0);
   });
 
   it('handles promises (e.g. an angular resource)', function () {
     var docs = [
       { path: 'foo.feature', name: 'Foo' },
     ];
-    var deferred = q.defer();
-    var promise = deferred.promise;
-    var result = { $promise: promise }
-    promise.then(function () { 
-      result[0] = docs[0];
-    });
-    deferred.resolve();
-    renderDocs(result);
+    var deferred = $q.defer();
+    renderDocs({ $promise: deferred.promise });
 
-    var listItems = element.find('li');
-    expect(listItems.length).toBe(1);
+    expect(element.find('li').length).toBe(0);
+    deferred.resolve(docs);
+    scope.$apply();
+    expect(element.find('li').length).toBe(1);
   });
 
   it('renders one <li> per doc', function () {
@@ -49,14 +42,14 @@ describe('toc', function () {
       { path: 'bar.feature', name: 'Bar' }
     ]);
 
-    var listItems = element.find('li');
-    expect(listItems.length).toBe(2);
+    expect(element.find('li').length).toBe(2);
   });
 
   it('renders nested lists', function ()  {
     renderDocs([
       { path: 'one.feature', name: 'One' },
-      { path: 'two/three.feature', name: 'Three' }
+      { path: 'two/three.feature', name: 'Three' },
+      { path: 'two/four.feature', name: 'Four' }
     ]);
 
     var links = element.find('nav ol li a').toArray();
@@ -64,18 +57,15 @@ describe('toc', function () {
     expect(names).toEqual(["One", "Two"]);
   });
 
-  it('updates when the docs attribute changes', function () {
+  it('updates when the docs attribute is mutated', function () {
     renderDocs([
       { path: 'foo.feature', name: 'Foo' }
     ]);
 
-    var listItems = element.find('li');
-    expect(listItems.length).toBe(1);
-
+    expect(element.find('li').length).toBe(1);
     scope.docs.push({ path: 'bar.feature', name: 'Bar' });
     scope.$digest();
-    listItems = element.find('li');
-    expect(listItems.length).toBe(2);
+    expect(element.find('li').length).toBe(2);
   });
 
   it('renders with a `dirty` class if the doc is dirty', function () {

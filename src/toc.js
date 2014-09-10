@@ -19,22 +19,37 @@ angular.module('CucumberProTOC', [])
       },
 
       link: function (scope, element, attributes) {
-        scope.$watch('docs', function (docs) {
+        // TODO: rather than watching for objectEquality, it would be nicer to make this functional
+        scope.$watch('docs', setLevelDocs, true);
+
+        function setLevelDocs(docs) {
           if (!docs) return;
-          if (docs.$promise) {
-            return docs.$promise.then(setLevelDocs);
-          }
-          setLevelDocs();
-          function setLevelDocs() {
+          if (docs.$promise) return docs.$promise.then(set);
+          set(docs);
+          function set(docs) {
             scope.levelDocs = nest(docs);
           }
-        });
+        }
 
         function nest(flatDocs) {
-          // why does this break things so spectacularly?
           levelDocs = flatDocs.map(function (doc) {
-            return doc;
-          });
+            if (doc.path.indexOf("/") < 0) return doc;
+            var segment = doc.path.split("/")[0]
+            var dir = {
+              path: segment,
+              name: inflection.capitalize(segment)
+            }
+            return dir;
+          }).reduce(function (docs, doc) {
+            var paths = docs.map(function (doc) { return doc.path; });
+            if (paths.indexOf(doc.path) < 0) {
+              doc.docs = doc.docs || [];
+              docs.push(doc);
+            } else {
+              docs[paths.indexOf(doc.path)].docs.push(doc);
+            }
+            return docs;
+          }, []);
           return levelDocs;
         }
       }
