@@ -145,7 +145,6 @@ angular.module('CucumberProTOC', [])
       require: '^cpToc',
       template: '\
       <ol data-ng-show="nodes.length > 0"> \
-         <pre>{{ nodes }}</pre> \
         <li \
           data-ng-repeat="node in nodes | orderBy:\'path\'" \
           ng-class="{dirty: node.isDirty(), outdated: node.isOutdated(), deleted: node.isDeleted(), open: isDocOpen(node) }">\
