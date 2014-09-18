@@ -51,19 +51,25 @@ angular.module('CucumberProTOC', [])
           throw new Error("Invalid root \"" + root + "\" - it must end with a forward-slash, or be an empty string.");
         }
 
-        if (!_.find(_.map(nodes, 'path'), function (path) { return path.indexOf(root) === 0; })) {
-          throw new Error("Invalid root \"" + root + "\" for path \"" + path + "\".");
+        if (!_.find(nodes, function (node) { return !isOutsideRoot(node); })) {
+          throw new Error("Invalid root \"" + root + "\" for path \"" + node.path + "\".");
         }
       }
 
-      function relativePath(path) {
-        if (path.indexOf(root) !== 0) {
+      function relativePath(node) {
+        if (isOutsideRoot(node)) {
+          throw new Error("Invalid root \"" + root + "\" for path \"" + node.path + "\".");
         }
-        return path.replace(root, '');
+        return node.path.replace(root, '');
       }
 
       function isAtThisLevel(node) { 
-        return relativePath(node.path).indexOf("/") < 0; 
+        if (isOutsideRoot(node)) return false;
+        return relativePath(node).indexOf("/") < 0; 
+      }
+
+      function isOutsideRoot(node) {
+        return node.path.indexOf(root) !== 0;
       }
 
       function docs() {
@@ -71,7 +77,9 @@ angular.module('CucumberProTOC', [])
       }
 
       function descendents() {
-        return _.reject(nodes, isAtThisLevel);
+        return _.reject(nodes, function (node) {
+          return isOutsideRoot(node) || isAtThisLevel(node);
+        });
       }
 
       function descendentsOf(path) {
@@ -80,21 +88,47 @@ angular.module('CucumberProTOC', [])
         });
       }
 
+      function childDirs(doNotTruncate) {
+        function getPathSegment(doc) {
+          return relativePath(doc).split("/")[0];
+        }
+        var segments = _.uniq(_.map(descendents(), getPathSegment));
+        return segments.map(function (segment) {
+          var path = root + segment;
+          return {
+            path: path,
+            name: inflection.humanize(segment),
+            children: new TreeBuilder(descendentsOf(path), path + '/').tree(doNotTruncate)
+          };
+        });
+      }
+
       var self = {
-        tree: function () {
-          function getPathSegment(doc) { 
-            return relativePath(doc.path).split("/")[0];
+
+        tree: function (doNotTruncate) {
+          // stop truncating if there are docs to show in this directory
+          doNotTruncate = doNotTruncate || (docs().length > 0)
+
+          var dirs = childDirs(doNotTruncate);
+
+          // stop truncating if any child directories have docs
+          function hasDocs(dir) {
+            function isDoc(node) {
+              return !node.children;
+            }
+            return _.some(dir.children, isDoc);
           }
-          var segments = _.uniq(_.map(descendents(), getPathSegment));
-          var dirs = segments.map(function (segment) {
-            var path = root + segment;
-            return {
-              path: path,
-              name: inflection.humanize(segment),
-              children: new TreeBuilder(descendentsOf(path), path + '/').tree()
-            };
-          });
-          return docs().concat(dirs);
+
+          if (!doNotTruncate && _.filter(dirs, hasDocs).length > 1) {
+            doNotTruncate = true;
+            dirs = childDirs(doNotTruncate);
+          }
+
+          if (doNotTruncate) {
+            return docs().concat(dirs);
+          } else {
+            return _.flatten(_.map(dirs, 'children'));
+          }
         }
       }
       return self;

@@ -1,5 +1,3 @@
-// TODO: remove names from most test data
-// TODO: explicit test for creating dir names
 describe('TreeBuilder', function () {
   var TreeBuilder;
 
@@ -41,37 +39,104 @@ describe('TreeBuilder', function () {
 
   it('infers the directory name from the path', function () {
     var docs = [
-      { path: 'this_folder/a.feature' },
+      { path: 'a.feature' },
+      { path: 'this_folder/b.feature' },
     ];
-    var expected = [
-      { path: 'this_folder', name: 'This folder', children: [
-        { path: 'this_folder/a.feature' }
-      ]}
-    ];
-    expect(tree(docs)).toEqual(expected);
+    var dir = _.find(tree(docs), function (node) { return node.path === 'this_folder'; });
+    expect(dir.name).toEqual('This folder');
   });
 
   it('builds a two-level nested tree', function () {
     var docs = [
-      { path: 'a/b/c.feature' },
+      { path: '1.feature' },
+      { path: 'a/2.feature' },
+      { path: 'a/b/3.feature' }
     ];
     var expected = [
+      { path: '1.feature' },
       { path: 'a', name: 'A', children: [
+        { path: 'a/2.feature' },
         { path: 'a/b', name: 'B', children: [
-          { path: 'a/b/c.feature' }
+          { path: 'a/b/3.feature' }
         ] }
       ] }
     ];
     expect(tree(docs)).toEqual(expected);
   });
 
+  describe('truncating', function () {
+    it('truncates the root directory for a simple hierarchy', function () {
+      var docs = [
+        { path: 'features/1.feature' },
+        { path: 'features/2.feature' }
+      ];
+      // note that there's no directory wrapping these docs
+      var expected = [
+        { path: 'features/1.feature' },
+        { path: 'features/2.feature' }
+      ]
+      expect(tree(docs)).toEqual(expected);
+    });
+
+    it('truncates the ancestor directories for a deep hierarchy', function () {
+      var docs = [
+        { path: 'src/com/relish/features/a.feature' }
+      ];
+
+      var expected = [
+        { path: 'src/com/relish/features/a.feature' }
+      ]
+      expect(tree(docs)).toEqual(expected);
+    });
+
+    it('truncates the common ancestor directories for a deep hierarchy', function () {
+      var docs = [
+        { path: 'src/com/relish/features/publishing/a.feature' },
+        { path: 'src/com/relish/features/reading/a.feature' }
+      ];
+
+      var expected = [
+        { path: 'src/com/relish/features/publishing', name: 'Publishing', children: [
+          { path: 'src/com/relish/features/publishing/a.feature' }
+        ]},
+        { path: 'src/com/relish/features/reading', name: 'Reading', children: [
+          { path: 'src/com/relish/features/reading/a.feature' }
+        ]},
+      ]
+      expect(tree(docs)).toEqual(expected);
+    });
+
+    it('truncates the common ancestor directories for a deep uneven hierarchy', function () {
+      var docs = [
+        { path: 'features/publishing/a.feature' },
+        { path: 'features/reading/docs/a.feature' }
+      ];
+
+      var expected = [
+        { path: 'features/publishing', name: 'Publishing', children: [
+          { path: 'features/publishing/a.feature' }
+        ]},
+        { path: 'features/reading', name: 'Reading', children: [
+          { path: 'features/reading/docs', name: 'Docs', children: [
+            { path: 'features/reading/docs/a.feature' }
+          ]}
+        ]},
+      ]
+      expect(tree(docs)).toEqual(expected);
+    });
+
+  });
+
   it('can start from a path below the root', function () {
     var docs = [
-      { path: 'a/b/c.feature' }
+      { path: 'x.feature' },
+      { path: 'a/y.feature' },
+      { path: 'a/b/z.feature' }
     ];
     var expected = [
+      { path: 'a/y.feature' },
       { path: 'a/b', name: 'B', children: [
-        { path: 'a/b/c.feature' }
+        { path: 'a/b/z.feature' }
       ] }
     ];
     expect(tree(docs, 'a/')).toEqual(expected);
