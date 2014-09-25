@@ -88,7 +88,7 @@ angular.module('CucumberProTOC', [])
         });
       }
 
-      function childDirs(doNotTruncate) {
+      function dirs() {
         function getPathSegment(doc) {
           return relativePath(doc).split("/")[0];
         }
@@ -98,37 +98,27 @@ angular.module('CucumberProTOC', [])
           return {
             path: path,
             name: inflection.humanize(segment),
-            children: new TreeBuilder(descendentsOf(path), path + '/').tree(doNotTruncate)
+            children: new TreeBuilder(descendentsOf(path), path + '/').tree()
           };
         });
       }
 
+      function isDir(node) {
+        return !!node.children;
+      }
+
+      function truncate(nodes) {
+        // skip levels where there's just one dir and nothing else
+        if (nodes.length === 1 && isDir(nodes[0])) {
+          return nodes[0].children;
+        }
+        return nodes;
+      }
+
       var self = {
-
-        tree: function (doNotTruncate) {
-          // stop truncating if there are docs to show in this directory
-          doNotTruncate = doNotTruncate || (docs().length > 0)
-
-          var dirs = childDirs(doNotTruncate);
-
-          // stop truncating if any child directories have docs
-          function hasDocs(dir) {
-            function isDoc(node) {
-              return !node.children;
-            }
-            return _.some(dir.children, isDoc);
-          }
-
-          if (!doNotTruncate && _.filter(dirs, hasDocs).length > 1) {
-            doNotTruncate = true;
-            dirs = childDirs(doNotTruncate);
-          }
-
-          if (doNotTruncate) {
-            return docs().concat(dirs);
-          } else {
-            return _.flatten(_.map(dirs, 'children'));
-          }
+        tree: function () {
+          var nodes = docs().concat(dirs());
+          return truncate(nodes);
         }
       }
       return self;
