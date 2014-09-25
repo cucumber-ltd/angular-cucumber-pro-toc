@@ -1,19 +1,46 @@
 <!DOCTYPE html>
 <html>
   <head lang="en">
+    <style>
+      body {
+        font-family: Gill Sans;
+        font-size: 14pt;
+      }
+      textarea, #events {
+        font-family: Consolas;
+        font-size: 14pt;
+      } 
+      button {
+        font-size: 2em;
+        background-color: green;
+        color: white;
+      }
+      nav, textarea, #events {
+        border: 3px solid #ddd;
+        width: 600px;
+        padding: 10px;
+        margin-top: 4px;
+      }
+      a:link, a:visited, a[ng-click], a[data-ng-click] {
+        cursor: pointer;
+      }
+      a:hover {
+        color: orange;
+      }
+    </style>
   </head>
   <body>
     <div ng-app="testApp">
       <div ng-controller="Controller">
         <div style="float:left">
-          <h2>Input</h2>
           <textarea ng-model="json" rows="20"></textarea>
           <br>
           <button ng-click="render()">Render</button>
         </div>
         <div style="float:left">
-          <h2>Output</h2>
-          <cp-toc docs="docs"></cp-toc>
+          <cp-toc docs="docs" on-click="nodeClicked(doc)"></cp-toc>
+          <div id="events">
+          </div>
         </div>
       </div>
     </div>
@@ -25,10 +52,10 @@
       var app = angular.module("testApp", ['CucumberProTOC']);
       app.controller("Controller", function ($scope) {
         $scope.docs = [
-          { path: 'a.feature', name: 'A' },
-          { path: 'b/c.feature', name: 'C' },
-          { path: 'b/d.feature', name: 'D' },
-          { path: 'e.feature', name: 'E' }
+          { path: 'a.feature', name: 'a' },
+          { path: 'b/c.feature', name: 'c' },
+          { path: 'b/d.feature', name: 'd' },
+          { path: 'e.feature', name: 'e' }
         ];
         $scope.json = JSON.stringify($scope.docs, null, 2);
         $scope.render = function () {
@@ -36,6 +63,11 @@
           $scope.docs = JSON.parse($scope.json);
           console.log($scope.docs);
         }
+        $scope.nodeClicked = function (node) {
+          angular
+          .element(document.querySelector('#events'))
+          .text(JSON.stringify(node, undefined, 2) + '<br>');
+        };
       });
     </script>
   </body>
