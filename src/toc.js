@@ -72,8 +72,8 @@ angular.module('CucumberProTOC', [])
         return node.path.indexOf(root) !== 0;
       }
 
-      function docs() {
-        return _.filter(nodes, isAtThisLevel);
+      function dirname(filePath) {
+        return filePath.substring(0, filePath.lastIndexOf('/'));
       }
 
       function descendents() {
@@ -88,6 +88,12 @@ angular.module('CucumberProTOC', [])
         });
       }
 
+      function docs() {
+        return _.map(_.filter(nodes, isAtThisLevel), function (doc) {
+          return asNode.call(doc);
+        });
+      }
+
       function dirs() {
         function getPathSegment(doc) {
           return relativePath(doc).split("/")[0];
@@ -95,12 +101,21 @@ angular.module('CucumberProTOC', [])
         var segments = _.uniq(_.map(descendents(), getPathSegment));
         return segments.map(function (segment) {
           var path = root + segment;
-          return {
+          var dir = {
             path: path,
             name: inflection.humanize(segment),
-            children: new TreeBuilder(descendentsOf(path), path + '/').tree()
-          };
+            children: new TreeBuilder(descendentsOf(path), path + '/').tree(),
+          }
+          return asNode.call(dir);
         });
+      }
+
+      // 'mixin' function to extend the given object with functions we expect on any node
+      function asNode() {
+        this.isOnPath = function (searchPath) {
+          return (searchPath || '').indexOf(dirname(this.path)) === 0;
+        };
+        return this;
       }
 
       function isDir(node) {
@@ -140,11 +155,14 @@ angular.module('CucumberProTOC', [])
       },
 
       controller: function ($scope) {
-        if (typeof inflection == "undefined") throw new Error("inflection library must be laoded in the page");
-        if (typeof _ == "undefined") throw new Error("lodash library must be laoded in the page");
+        if (typeof inflection == "undefined") 
+          throw new Error("inflection library must be loaded in the page");
+        if (typeof _ == "undefined") 
+          throw new Error("lodash library must be loaded in the page");
 
         // share the onClick function with all the child cp-level directives
         this.onClick = $scope.onClick;
+        console.log($scope.currentDocPath);
       },
 
       link: function (scope, element, attributes) {
@@ -171,7 +189,8 @@ angular.module('CucumberProTOC', [])
       <ol data-ng-show="nodes.length > 0"> \
         <li \
           data-ng-repeat="node in nodes | orderBy:\'path\'" \
-          ng-class="{dirty: node.isDirty(), outdated: node.isOutdated(), deleted: node.isDeleted(), open: isDocOpen(node) }">\
+          data-ng-class="{dirty: node.isDirty(), outdated: node.isOutdated(), deleted: node.isDeleted(), open: isOpen(node) }" \
+          data-ng-show="isOpen(node)" >\
           <a data-ng-click="onClick({ doc: node }); $event.stopPropagation()" title="{{ node.path }}">{{ node.name }}</a>\
           <cp-toc-level nodes="node.children" current-doc-path="currentDocPath"> \
         </li>\
@@ -186,8 +205,8 @@ angular.module('CucumberProTOC', [])
 
       link: function (scope, element, attributes, controller) {
         scope.onClick = controller.onClick;
-        scope.isDocOpen = function (doc) {
-          return (doc.path === scope.currentDocPath);
+        scope.isOpen = function (node) {
+          return node.isOnPath(scope.currentDocPath);
         };
       },
 

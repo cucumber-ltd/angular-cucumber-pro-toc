@@ -95,6 +95,23 @@ describe('toc', function () {
     expect($(listItems[1]).hasClass('open')).toBeTruthy();
   });
 
+  it("renders directories' children with style='display:none;' if not on the path to the open doc", function () {
+    element = $('<div><cp-toc docs="docs" current-doc-path="\'a/2.feature\'"></cp-toc></div>');
+    renderDocs([
+      { path: '1.feature', name: 'Open' },
+      { path: 'a/2.feature', name: 'Open' },
+      { path: 'b/3.feature', name: 'Not open' }
+    ]);
+    /* should render as:
+     - 1
+     - a
+       - 2
+     - b
+     */
+    var listItems = element.find('li');
+    expect(listItems.length).toBe(4);
+  });
+
   it('renders with an `outdated` class if the doc is outdated', function () {
     element = $('<div><cp-toc docs="docs"></cp-toc></div>');
     renderDocs([

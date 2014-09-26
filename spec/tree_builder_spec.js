@@ -8,7 +8,8 @@ describe('TreeBuilder', function () {
   }));
 
   function tree(docs, root) {
-    return new TreeBuilder(docs, root).tree();
+    var tree = new TreeBuilder(docs, root).tree();
+    return bare(tree);
   }
 
   it('builds a flat tree', function () {
@@ -151,7 +152,10 @@ describe('TreeBuilder', function () {
     expect(function () { tree(docs, 'a/b/')}).not.toThrow();
     expect(function () { tree(docs, 'a')}).toThrow();
     expect(function () { tree(docs, 'wat')}).toThrow();
-    expect(function () { tree(docs, 'b/')}).toThrow();
   });
+
+  function bare(object) {
+    return JSON.parse(JSON.stringify(object));
+  }
 
 });

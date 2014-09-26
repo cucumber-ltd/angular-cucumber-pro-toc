@@ -2,7 +2,7 @@
 <html>
   <head lang="en">
     <style>
-      body {
+      body, input {
         font-family: Gill Sans;
         font-size: 14pt;
       }
@@ -15,11 +15,16 @@
         background-color: green;
         color: white;
       }
-      nav, textarea, #events {
+      nav, textarea, #events, #current-path, h2 {
         border: 3px solid #ddd;
         width: 600px;
         padding: 10px;
-        margin-top: 4px;
+        margin: 4px;
+      }
+      h2 {
+        margin-bottom: -7px;
+        font-size: 1em;
+        background-color: #eee;
       }
       a:link, a:visited, a[ng-click], a[data-ng-click] {
         cursor: pointer;
@@ -27,20 +32,33 @@
       a:hover {
         color: orange;
       }
+      .open {
+        color: green;
+      }
+      ol li {
+        list-style-type: disc;
+      }
+      ol {
+        padding-left: 20px;
+      }
     </style>
   </head>
   <body>
     <div ng-app="testApp">
       <div ng-controller="Controller">
         <div style="float:left">
+          <h2>Input</h2>
           <textarea ng-model="json" rows="20"></textarea>
           <br>
-          <button ng-click="render()">Render</button>
         </div>
         <div style="float:left">
-          <cp-toc docs="docs" on-click="nodeClicked(doc)"></cp-toc>
-          <div id="events">
-          </div>
+          <button ng-click="render()">Render &#8628;</button>
+          <h2>Tree</h2>
+          <cp-toc docs="docs" on-click="nodeClicked(doc)" current-doc-path="currentPath"></cp-toc>
+          <h2>Current Path</h2>
+          <div id="current-path"><input type="text" ng-model="currentPath"></div>
+          <h2>Events</h2>
+          <div id="events"></div>
         </div>
       </div>
     </div>
@@ -52,22 +70,22 @@
       var app = angular.module("testApp", ['CucumberProTOC']);
       app.controller("Controller", function ($scope) {
         $scope.docs = [
-          { path: 'a.feature', name: 'a' },
-          { path: 'b/c.feature', name: 'c' },
-          { path: 'b/d.feature', name: 'd' },
-          { path: 'e.feature', name: 'e' }
+          { path: 'a.feature', name: 'A' },
+          { path: 'b/c.feature', name: 'C' },
+          { path: 'b/d/e.feature', name: 'E' },
+          { path: 'f.feature', name: 'F' }
         ];
         $scope.json = JSON.stringify($scope.docs, null, 2);
         $scope.render = function () {
-          console.log($scope.json);
           $scope.docs = JSON.parse($scope.json);
-          console.log($scope.docs);
         }
         $scope.nodeClicked = function (node) {
           angular
           .element(document.querySelector('#events'))
-          .text(JSON.stringify(node, undefined, 2) + '<br>');
+          .text(JSON.stringify(node, null, 2) + '<br>');
+          $scope.currentPath = node.path;
         };
+        $scope.currentPath = 'b/c.feature';
       });
     </script>
   </body>
