@@ -112,8 +112,12 @@ angular.module('CucumberProTOC', [])
 
       // 'mixin' function to extend the given object with functions we expect on any node
       function asNode() {
-        this.isOnPath = function (searchPath) {
+        this.isOnOrAroundPath = function (searchPath) {
           return (searchPath || '').indexOf(dirname(this.path)) === 0;
+        };
+        this.isOnPath = function (searchPath) {
+          var result = (searchPath || '').indexOf(this.path) === 0;
+          return result;
         };
         return this;
       }
@@ -189,8 +193,8 @@ angular.module('CucumberProTOC', [])
       <ol data-ng-show="nodes.length > 0"> \
         <li \
           data-ng-repeat="node in nodes | orderBy:\'path\'" \
-          data-ng-class="{dirty: node.isDirty(), outdated: node.isOutdated(), deleted: node.isDeleted(), open: isOpen(node) }" \
-          data-ng-show="isOpen(node)" >\
+          data-ng-class="{dirty: node.isDirty(), outdated: node.isOutdated(), deleted: node.isDeleted(), open: isCurrent(node) }" \
+          data-ng-show="isVisible(node)" >\
           <a data-ng-click="onClick({ doc: node }); $event.stopPropagation()" title="{{ node.path }}">{{ node.name }}</a>\
           <cp-toc-level nodes="node.children" current-doc-path="currentDocPath"> \
         </li>\
@@ -205,9 +209,12 @@ angular.module('CucumberProTOC', [])
 
       link: function (scope, element, attributes, controller) {
         scope.onClick = controller.onClick;
-        scope.isOpen = function (node) {
-          return node.isOnPath(scope.currentDocPath);
+        scope.isVisible = function (node) {
+          return node.isOnOrAroundPath(scope.currentDocPath);
         };
+        scope.isCurrent = function (node) {
+          return (node.path === scope.currentDocPath);
+        }
       },
 
       compile: function (element, link) {
