@@ -71,17 +71,7 @@ describe('toc', function () {
     expect(element.find('li').length).toBe(2);
   });
 
-  it('renders with a `dirty` class if the doc is dirty', function () {
-    renderDocs([
-      { path: 'clean.feature', name: 'Clean', isDirty: function () { return false; } },
-      { path: 'dirty.feature', name: 'Dirty', isDirty: function () { return true; } }
-    ]);
-
-    var listItems = element.find('li');
-    expect($(listItems[0]).hasClass('dirty')).toBeFalsy();
-    expect($(listItems[1]).hasClass('dirty')).toBeTruthy();
-  });
-
+  // TODO - consider getting the client to do this
   it('renders with an `open` class if the doc is open', function () {
     element = $('<div><cp-toc docs="docs" current-doc-path="\'open.feature\'"></cp-toc></div>');
     renderDocs([
@@ -114,28 +104,16 @@ describe('toc', function () {
     expect(listItems.length).toBe(4);
   });
 
-  it('renders with an `outdated` class if the doc is outdated', function () {
-    element = $('<div><cp-toc docs="docs"></cp-toc></div>');
+  it('renders li elements with the dynamic class specified li-class', function () {
+    element = $('<div><cp-toc docs="docs" li-class="{ crazy: node.isCrazy() }"></cp-toc></div>');
     renderDocs([
-      { path: 'outdated.feature', name: 'Outdated', isOutdated: function () { return true; } },
-      { path: 'pristine.feature', name: 'Pristine', isOutdated: function () { return false; } }
+      { path: 'crazy.feature', name: 'Crazy', isCrazy: function () { return true; } },
+      { path: 'sleepy.feature', name: 'Sleepy', isCrazy: function () { return false; } }
     ]);
 
     var listItems = element.find('li');
-    expect($(listItems[0]).hasClass('outdated')).toBeTruthy();
-    expect($(listItems[1]).hasClass('outdated')).toBeFalsy();
-  });
-
-  it('renders with a `deleted` class if the doc is deleted', function () {
-    element = $('<div><cp-toc docs="docs"></cp-toc></div>');
-    renderDocs([
-      { path: 'deleted.feature', name: 'Deleted', isDeleted: function () { return true; } },
-      { path: 'pristine.feature', name: 'Pristine', isDeleted: function () { return false; } }
-    ]);
-
-    var listItems = element.find('li');
-    expect($(listItems[0]).hasClass('deleted')).toBeTruthy();
-    expect($(listItems[1]).hasClass('deleted')).toBeFalsy();
+    expect($(listItems[0]).hasClass('crazy')).toBeTruthy();
+    expect($(listItems[1]).hasClass('crazy')).toBeFalsy();
   });
 
   // TODO: work out how to test this - it works, but I can't test it!

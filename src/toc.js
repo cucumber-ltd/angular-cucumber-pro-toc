@@ -30,8 +30,8 @@ angular.module('CucumberProTOC', [])
         return node.path.indexOf(root) !== 0;
       }
 
-      function dirname(filePath) {
-        return filePath.substring(0, filePath.lastIndexOf('/'));
+      function isDir(node) {
+        return !!node.children;
       }
 
       function descendents() {
@@ -47,9 +47,7 @@ angular.module('CucumberProTOC', [])
       }
 
       function docs() {
-        return _.map(_.filter(nodes, isAtThisLevel), function (doc) {
-          return asNode.call(doc);
-        });
+        return _.filter(nodes, isAtThisLevel)
       }
 
       function dirs() {
@@ -59,29 +57,17 @@ angular.module('CucumberProTOC', [])
         var segments = _.uniq(_.map(descendents(), getPathSegment));
         return segments.map(function (segment) {
           var path = root + segment;
-          var dir = {
+          return {
             path: path,
             name: inflection.humanize(segment),
             children: new TreeBuilder(descendentsOf(path), path + '/').tree(),
           }
-          return asNode.call(dir);
         });
-      }
-
-      // 'mixin' function to extend the given object with functions we expect on any node
-      function asNode() {
-        this.isOnOrAroundPath = function (searchPath) {
-          return (searchPath || '').indexOf(dirname(this.path)) === 0;
-        };
-        this.isDir = function () {
-          return !!this.children;
-        };
-        return this;
       }
 
       function truncate(nodes) {
         // skip levels where there's just one dir and nothing else
-        if (nodes.length === 1 && nodes[0].isDir()) {
+        if (nodes.length === 1 && isDir(nodes[0])) {
           return nodes[0].children;
         }
         return nodes;
@@ -108,7 +94,8 @@ angular.module('CucumberProTOC', [])
       scope: {
         docs: "=",
         onClick: "&",
-        currentDocPath: "="
+        currentDocPath: "=",
+        liClass: "&"
       },
 
       controller: function ($scope) {
@@ -117,8 +104,9 @@ angular.module('CucumberProTOC', [])
         if (typeof _ == "undefined") 
           throw new Error("lodash library must be loaded in the page");
 
-        // share the onClick function with all the child cp-level directives
+        // share these attributes with the child cp-level directives
         this.onClick = $scope.onClick;
+        this.liClass = $scope.liClass;
       },
 
       link: function (scope, element, attributes) {
@@ -145,7 +133,7 @@ angular.module('CucumberProTOC', [])
       <ol data-ng-show="nodes.length > 0"> \
         <li \
           data-ng-repeat="node in nodes | orderBy:\'path\'" \
-          data-ng-class="{dirty: node.isDirty(), outdated: node.isOutdated(), deleted: node.isDeleted(), open: isCurrent(node) }" \
+          data-ng-class="ngClass(node)" \
           data-ng-show="isVisible(node)" >\
           <a data-ng-click="onClick({ doc: node }); $event.stopPropagation()" title="{{ node.path }}">{{ node.name }}</a>\
           <cp-toc-level nodes="node.children" current-doc-path="currentDocPath"> \
@@ -160,13 +148,25 @@ angular.module('CucumberProTOC', [])
       },
 
       link: function (scope, element, attributes, controller) {
+        function isOnOrAroundPath(node, path) {
+          return (path || '').indexOf(dirname(node.path)) === 0;
+        }
+        function dirname(path) {
+          return path.substring(0, path.lastIndexOf('/'));
+        }
+
         scope.onClick = controller.onClick;
+        scope.ngClass = function (node) {
+          var result = controller.liClass({ node: node }) || {};
+          result.open = scope.isCurrent(node);
+          return result;
+        };
         scope.isVisible = function (node) {
-          return node.isOnOrAroundPath(scope.currentDocPath);
+          return isOnOrAroundPath(node, scope.currentDocPath);
         };
         scope.isCurrent = function (node) {
           return (node.path === scope.currentDocPath);
-        }
+        };
       },
 
       compile: function (element, link) {
