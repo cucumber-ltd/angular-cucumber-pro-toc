@@ -24,7 +24,7 @@ describe('toc', function () {
       expect(element.find('li').length).toBe(2);
     });
 
-    it('renders a nested list', function () {
+    it('renders a nested list, inferring directory names', function () {
       renderDocs([
         { path: 'a.feature', name: 'A' },
         { path: 'b/c.feature', name: 'C' },
@@ -76,25 +76,52 @@ describe('toc', function () {
   });
 
   describe("current-doc-path attribute", function () {
+    function isHidden(element) {
+      return $(element).attr('class').match(/ng-hide/); 
+    }
+
+    function nodeNames() {
+      var listItems = _.reject(element.find('li'), isHidden);
+      return listItems.map(function (li) { return $(li).find('a')[0].text; });
+    }
 
     it("hides directories' children if not on the path to the current doc", function () {
-      element = $('<div><cp-toc docs="docs" current-doc-path="\'a/2.feature\'"></cp-toc></div>');
+      element = $('<div><cp-toc docs="docs" current-doc-path="\'b/c.feature\'"></cp-toc></div>');
       renderDocs([
-        { path: '1.feature', name: 'Open' },
-        { path: 'a/2.feature', name: 'Open' },
-        { path: 'b/3.feature', name: 'Not open' }
+        { path: 'a.feature', name: 'A' },
+        { path: 'b/c.feature', name: 'C' },
+        { path: 'd/e.feature', name: 'E' }
       ]);
-      /* should render as:
-         - 1
-         - A
-         -   2
-         - B
-         */
-      function isHidden(element) {
-        return $(element).attr('class').match(/ng-hide/); 
-      }
-      var listItems = _.reject(element.find('li'), isHidden);
-      expect(listItems.length).toBe(4);
+      expect(nodeNames()).toEqual([
+        "A",
+        "B",
+         "C",
+        "D"
+      ]);
+    });
+
+    it("updates the tree dynamically if changed", function () {
+      scope.currentPath = 'b/c.feature';
+      element = $('<div><cp-toc docs="docs" current-doc-path="currentPath"></cp-toc></div>');
+      renderDocs([
+        { path: 'a.feature', name: 'A' },
+        { path: 'b/c.feature', name: 'C' },
+        { path: 'd/e.feature', name: 'E' }
+      ]);
+      expect(nodeNames()).toEqual([
+        "A",
+        "B",
+          "C",
+        "D"
+      ]);
+      scope.currentPath = 'd/e.feature';
+      scope.$digest();
+      expect(nodeNames()).toEqual([
+        "A",
+        "B",
+        "D",
+          "E"
+      ]);
     });
 
   });
