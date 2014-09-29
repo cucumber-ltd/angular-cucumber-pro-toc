@@ -1,20 +1,21 @@
-*What is this?*
+# TOC
 
-This is a simple angular module that contains the behaviour to render a list of documents as a table of contents.
+A small angular directive to render the table of contents for a project in [Cucumber Pro](https://app.cucumber.pro)
 
-*Is it done yet?*
+## Contributing
 
-Nope
+Install dependencies:
 
-*Why in a separate repo?*
+`npm install && bower install`
 
-It's an experiement in how we can avoid having a bloated angular app. I think that if we build it out of little self-contained components like this, we'll have a faster test suite and more fun!
+Run the tests
 
-*How will you make it work?*
+`karma start`
 
-Here are some places to nick ideas from: 
+Edit `src/toc.js`
 
-* http://stackoverflow.com/questions/19531453/transform-file-directory-structure-into-tree-in-javascript
-* http://briantford.com/blog/angular-bower
-* https://github.com/JimLiu/angular-ui-tree/blob/master/tests/main.spec.js
+## Manual testing
 
+The directive is test-driven, but it can still be useful to run it standalone for a manual test to visualse how it works.
+
+Just open the file `manual-test.html` in the root of this project.
