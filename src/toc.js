@@ -157,15 +157,10 @@ angular.module('CucumberProTOC', [])
 
         scope.onClick = controller.onClick;
         scope.ngClass = function (node) {
-          var result = controller.liClass({ node: node }) || {};
-          result.open = scope.isCurrent(node);
-          return result;
+          return controller.liClass({ node: node }) || {};
         };
         scope.isVisible = function (node) {
           return isOnOrAroundPath(node, scope.currentDocPath);
-        };
-        scope.isCurrent = function (node) {
-          return (node.path === scope.currentDocPath);
         };
       },
 
