@@ -138,6 +138,7 @@ describe('toc', function () {
     expect($(listItems[1]).hasClass('deleted')).toBeFalsy();
   });
 
+  // TODO: work out how to test this - it works, but I can't test it!
   xit('fires the onclick function when clicked', function (callback) {
     scope.$apply(function () {
       scope.onClickFn = jasmine.createSpy('on-click callback');
