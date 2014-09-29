@@ -2,7 +2,6 @@ describe('toc', function () {
   var element, scope, compile, $q
 
   beforeEach(module('CucumberProTOC'));
-  beforeEach(module('CucumberProTOC'));
 
   beforeEach(inject(function($rootScope, $compile, _$q_) {
     element = $('<div><cp-toc docs="docs"></cp-toc></div>');
@@ -95,7 +94,7 @@ describe('toc', function () {
     expect($(listItems[1]).hasClass('open')).toBeTruthy();
   });
 
-  it("renders directories' children with style='display:none;' if not on the path to the open doc", function () {
+  it("hides directories' children if not on the path to the current doc", function () {
     element = $('<div><cp-toc docs="docs" current-doc-path="\'a/2.feature\'"></cp-toc></div>');
     renderDocs([
       { path: '1.feature', name: 'Open' },
@@ -103,12 +102,15 @@ describe('toc', function () {
       { path: 'b/3.feature', name: 'Not open' }
     ]);
     /* should render as:
-     - 1
-     - a
-       - 2
-     - b
-     */
-    var listItems = element.find('li');
+       - 1
+       - A
+       -   2
+       - B
+       */
+    function isHidden(element) {
+      return $(element).attr('class').match(/ng-hide/); 
+    }
+    var listItems = _.reject(element.find('li'), isHidden);
     expect(listItems.length).toBe(4);
   });
 
@@ -145,12 +147,11 @@ describe('toc', function () {
       { path: 'clicked.feature', name: 'Clicked' },
       { path: 'not_clicked.feature', name: 'Not clicked' }
     ];
-    var expectedDoc = docs[1];
     renderDocs(docs);
 
     var link = element.find('li').eq(0).find('a');
     link.click();
-    expect(scope.onClickFn).toHaveBeenCalledWith(expectedDoc);
+    expect(scope.onClickFn).toHaveBeenCalledWith(docs[0]);
   });
 
   function renderDocs(docs) {
