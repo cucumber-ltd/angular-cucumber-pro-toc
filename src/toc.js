@@ -110,7 +110,6 @@ angular.module('CucumberProTOC', [])
       },
 
       link: function (scope, element, attributes) {
-        // TODO: rather than watching for objectEquality, it would be nicer to make this functional
         scope.$watch('docs', setLevelDocs, true);
 
         function setLevelDocs(docs) {
@@ -130,13 +129,12 @@ angular.module('CucumberProTOC', [])
       replace: true,
       require: '^cpToc',
       template: '\
-      <ol data-ng-show="nodes.length > 0"> \
+      <ol> \
         <li \
           data-ng-repeat="node in nodes | orderBy:\'path\'" \
-          data-ng-class="ngClass(node)" \
-          data-ng-show="isVisible(node)" >\
+          data-ng-class="ngClass(node)" >\
           <a data-ng-click="onClick({ doc: node }); $event.stopPropagation()" title="{{ node.path }}">{{ node.name }}</a>\
-          <cp-toc-level nodes="node.children" current-doc-path="currentDocPath"> \
+          <cp-toc-level nodes="node.children" current-doc-path="currentDocPath" data-ng-show="shouldShowChildren(node)"> \
         </li>\
       </ol> \
       ',
@@ -148,20 +146,19 @@ angular.module('CucumberProTOC', [])
       },
 
       link: function (scope, element, attributes, controller) {
-        function isOnOrAroundPath(node, path) {
-          return (path || '').indexOf(dirname(node.path)) === 0;
-        }
-        function dirname(path) {
-          return path.substring(0, path.lastIndexOf('/'));
-        }
-
         scope.onClick = controller.onClick;
         scope.ngClass = function (node) {
           return controller.liClass({ node: node }) || {};
         };
-        scope.isVisible = function (node) {
-          return isOnOrAroundPath(node, scope.currentDocPath);
-        };
+
+        scope.shouldShowChildren = function (node) {
+          function isOnPath(node, path) {
+            return path.indexOf(node.path) === 0;
+          }
+
+          if ((node.children || []).length === 0) return false;
+          return isOnPath(node, scope.currentDocPath || "");
+        }
       },
 
       compile: function (element, link) {

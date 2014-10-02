@@ -76,13 +76,10 @@ describe('toc', function () {
   });
 
   describe("current-doc-path attribute", function () {
-    function isHidden(element) {
-      return $(element).attr('class').match(/ng-hide/); 
-    }
 
     function nodeNames() {
-      var listItems = _.reject(element.find('li'), isHidden);
-      return listItems.map(function (li) { return $(li).find('a')[0].text; });
+      var links = element.find("ol:not('.ng-hide') > li > a").toArray();
+      return _.map(links, 'text');
     }
 
     it("hides directories' children if not on the path to the current doc", function () {
@@ -97,6 +94,16 @@ describe('toc', function () {
         "B",
          "C",
         "D"
+      ]);
+    });
+
+    it("still shows stuff when nothing's selected", function () {
+      element = $('<div><cp-toc docs="docs" current-doc-path=""></cp-toc></div>');
+      renderDocs([
+        { path: 'features/a.feature', name: 'A' },
+      ]);
+      expect(nodeNames()).toEqual([
+        "A",
       ]);
     });
 
